@@ -165,7 +165,7 @@ class DeepXplore:
 
         print(f"\n[DeepXplore] {max_seeds}개의 시드 입력 탐색 시작")
 
-        for batch_inputs, batch_labels in tqdm(data_loader, desc="DeepXplore 실행"):
+        for batch_inputs, batch_labels in tqdm(data_loader, desc="DeepXplore 실행", total = max_seeds ):
             for i in range(batch_inputs.size(0)):
                 if seed_count >= max_seeds:
                     break
