@@ -36,8 +36,7 @@ pip install -r requirements.txt
 
 ### 2. GPU 사용 (선택, 강력 권장)
 
-CUDA가 설치된 환경에서는 자동으로 GPU를 사용합니다.  
-GPU가 없으면 CPU로 실행되며, 학습에 상당한 시간이 걸립니다.
+CUDA가 설치된 환경에서는 자동으로 GPU를 사용  
 
 ```bash
 # CUDA 버전 확인 후 해당 버전의 torch 설치
@@ -55,7 +54,7 @@ python test.py
 ```
 
 - CIFAR-10 자동 다운로드 → 두 모델 30 epochs 학습 → DeepXplore 200 seeds 탐색 → 결과 저장
-- GPU 기준 약 30~60분 소요
+- GPU 기준 약 60~90분 소요
 
 ### 빠른 테스트 (5 epochs, 50 seeds)
 
@@ -63,7 +62,7 @@ python test.py
 python test.py --quick
 ```
 
-- 기능 검증용 빠른 실행 (GPU 기준 5~10분)
+- 기능 검증용 빠른 실행 (GPU 기준 약 30분)
 
 ### 이미 학습된 모델 사용
 
@@ -75,7 +74,7 @@ python test.py --skip-train
 ### 기타 옵션
 
 ```bash
-python test.py --seeds 100          # 탐색 시드 수 지정
+python test.py --seeds 50          # 탐색 시드 수 지정
 python test.py --steps 200          # 최적화 반복 횟수 증가 (더 강한 perturbation)
 python test.py --lambda 0.7         # Disagreement loss 비중 증가
 python test.py --step-size 0.02     # Gradient step 크기 조정
@@ -117,12 +116,12 @@ model.fc = nn.Linear(model.fc.in_features, 10)
 
 ### 두 모델의 차별화 (Differential Testing 유효성)
 
-두 모델이 완전히 동일하면 differential testing이 의미없으므로, 다른 하이퍼파라미터로 학습합니다:
+두 모델이 완전히 동일하면 differential testing이 의미없으므로, 다른 하이퍼파라미터로 학습:
 
 - **Model A**: lr=0.1, weight_decay=5e-4 (표준 SGD 설정)
 - **Model B**: lr=0.05, weight_decay=1e-3 (더 강한 정규화)
 
-두 모델 모두 동일한 아키텍처(ResNet50)지만, 다른 초기화 랜덤 시드와 학습 경로를 거쳐 서로 다른 결정 경계를 형성합니다.
+두 모델 모두 동일한 아키텍처(ResNet50)지만, 다른 초기화 random seed와 학습 경로를 거쳐 서로 다른 decision boundary 형성, 동일한 random seed 설정을 사용하여 실행 시 유사한 결과를 재현할 수 있도록 구성
 
 ---
 
@@ -130,7 +129,9 @@ model.fc = nn.Linear(model.fc.in_features, 10)
 
 - `results/disagreement_XXX.png`: 각 케이스별 (시드 이미지 / 생성된 이미지 / perturbation 비교)
 - `results/summary.png`: 전체 결과 요약 (상위 5개 이미지 + coverage 막대그래프 + 클래스 분포)
-
+- DeepXplore는 200개의 시드 입력 중 173개의 disagreement를 발견했으며, 이는 86.5%의 높은 불일치 비율을 보였다.
+Neuron coverage는 Model A에서 93.69%, Model B에서 95.46%로 측정되었다.
+불일치는 주로 시각적으로 유사한 클래스 간에서 발생했으며, 예를 들어 cat/dog/frog와 같은 동물 클래스나 airplane/ship과 같은 운송수단 클래스에서 빈번하게 나타났다.
 ---
 
 ## 참고문헌
