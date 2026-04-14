@@ -1,19 +1,3 @@
-"""
-test.py
-DeepXplore를 ResNet50 CIFAR-10 모델에 실행하고 결과를 저장하는 메인 스크립트.
-
-실행 방법:
-    python test.py                  # 전체 실행 (모델 학습 포함, ~30 epochs)
-    python test.py --quick          # 빠른 테스트 (5 epochs, 50 seeds)
-    python test.py --skip-train     # 저장된 모델 사용 (학습 생략)
-    python test.py --seeds 100      # 탐색할 시드 수 지정
-
-출력:
-    - results/disagreement_001.png ~ results/disagreement_010.png : 개별 케이스
-    - results/summary.png : 전체 결과 요약
-    - model_a.pth, model_b.pth : 학습된 모델 가중치
-"""
-
 import argparse
 import os
 import torch
@@ -26,7 +10,6 @@ from visualize import save_disagreement_plots, save_summary_plot
 
 
 def get_test_loader(batch_size=1):
-    """배치 크기 1의 테스트 데이터로더 반환 (DeepXplore 시드용)"""
     test_transform = transforms.Compose([
         transforms.ToTensor(),
         transforms.Normalize((0.4914, 0.4822, 0.4465),
@@ -74,7 +57,7 @@ def main():
     print(f"  Skip train : {args.skip_train}")
     print(f"  Output dir : {args.output_dir}/")
 
-    # ── 1. 모델 준비 ──────────────────────────────────────
+    # 1. 모델 준비
     print("\n[1단계] 모델 준비")
     if args.skip_train and not (os.path.exists('model_a.pth') and os.path.exists('model_b.pth')):
         print("  ※ 저장된 모델이 없습니다. --skip-train을 해제하거나 모델을 먼저 학습하세요.")
@@ -95,7 +78,7 @@ def main():
     print(f"\n  Model A 테스트 정확도: {acc_a:.2f}%")
     print(f"  Model B 테스트 정확도: {acc_b:.2f}%")
 
-    # ── 2. DeepXplore 실행 ───────────────────────────────
+    #  2. DeepXplore 실행 
     print("\n[2단계] DeepXplore 실행")
     max_seeds = args.seeds if args.seeds is not None else (50 if args.quick else 200)
 
@@ -119,7 +102,7 @@ def main():
 
     results, coverage_a, coverage_b = dx.run(test_loader_seed, max_seeds=max_seeds)
 
-    # ── 3. 결과 출력 ────────────────────────────────────
+    # 3. 결과 출력 
     print("\n" + "=" * 60)
     print("  실험 결과 요약")
     print("=" * 60)
@@ -143,7 +126,7 @@ def main():
         pred_b_cls = CIFAR10_CLASSES[r['pred_b']]
         print(f"  #{i+1}: True={true_cls:12s} | Model A={pred_a_cls:12s} | Model B={pred_b_cls:12s}")
 
-    # ── 4. 시각화 저장 ───────────────────────────────────
+    # 4. 시각화 저장
     print(f"\n[3단계] 시각화 저장 → {args.output_dir}/")
     save_disagreement_plots(results, save_dir=args.output_dir, max_plots=10)
     save_summary_plot(results, coverage_a, coverage_b,
