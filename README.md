@@ -1,7 +1,5 @@
 # Assignment #2 - DeepXplore on CIFAR-10 ResNet50
 
-**Reliable and Trustworthy Artificial Intelligence**
-
 ## 프로젝트 구조
 
 ```
