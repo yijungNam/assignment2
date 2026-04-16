@@ -12,6 +12,7 @@
 ├── results/          # 실행 후 생성되는 결과 이미지 디렉토리
 │   ├── disagreement_001.png ~ disagreement_010.png
 │   └── summary.png
+├── report2.pdf       # problem 2 essay
 ├── model_a.pth       # 학습 후 저장되는 Model A 가중치
 └── model_b.pth       # 학습 후 저장되는 Model B 가중치
 ```
